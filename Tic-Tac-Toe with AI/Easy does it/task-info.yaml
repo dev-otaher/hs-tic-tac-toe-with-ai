@@ -202,6 +202,21 @@ files:
         }
     }
   learner_created: false
+- name: src/tictactoe/Player.java
+  visible: true
+  learner_created: true
+- name: src/tictactoe/Judge.java
+  visible: true
+  learner_created: true
+- name: src/tictactoe/Board.java
+  visible: true
+  learner_created: true
+- name: src/tictactoe/Helper.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/81/stages/448/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Sun, 03 Jul 2022 00:35:26 UTC
 record: -1
