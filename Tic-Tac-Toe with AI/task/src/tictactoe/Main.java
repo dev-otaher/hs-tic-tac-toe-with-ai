@@ -16,55 +16,62 @@ public class Main {
 
     public static void main(String[] args) {
         // write your code here
-        Board board = new Board("_________");
-        Judge judge = new Judge(board);
-        Player computer = new Player('O');
-        Player human = new Player('X');
         Scanner scanner = new Scanner(System.in);
-        int x = -1, y = -1;
-        boolean isHumanTurn = true;
-        printState(board.getState());
+        String[] inputs;
         do {
-            Player currentPlayer;
-            if (isHumanTurn) {
-                currentPlayer = human;
-                System.out.print("Enter the coordinates: ");
-                if (scanner.hasNextInt()) {
-                    x = Integer.parseInt(scanner.next());
-                }
-                if (scanner.hasNextInt()) {
-                    y = Integer.parseInt(scanner.next());
+            System.out.print("Input command: ");
+            inputs = scanner.nextLine().split(" ");
+            if (!inputs[0].equalsIgnoreCase("start") || inputs.length >= 3) {
+                if (inputs[0].equals("exit")) {
+                    continue;
                 }
             } else {
-                currentPlayer = computer;
-                int[] moves = computer.getMove();
-                x = moves[0];
-                y = moves[1];
+                System.out.println("Bad parameters!");
+                continue;
             }
-
-            if (x == -1 || y == -1) {
-                System.out.println("You should enter numbers!");
-                scanner.nextLine();
-            } else if (judge.isCoordinatesInRange(x, y)) {
-                if (judge.isValidMove(x, y)) {
-                    board.updateState(currentPlayer, x, y);
-                    if (!isHumanTurn) {
-                        System.out.println("Making move level \"easy\"");
-                    }
-                    printState(board.getState());
-                    String assessment = judge.assessBoard(human, computer, currentPlayer);
-                    if (assessment.equals("D") || assessment.equals("F")) {
-                        break;
-                    }
-                    isHumanTurn = !isHumanTurn;
+            Player p1 = new Player('X', inputs[1]), p2 = new Player('O', inputs[2]);
+            Board board = new Board("_________");
+            Judge judge = new Judge(board);
+            int x = -1, y = -1;
+            Player currentPlayer = p1;
+            printState(board.getState());
+            while (true) {
+                if (currentPlayer.isComputer()) {
+                    int[] moves = currentPlayer.getMove();
+                    x = moves[0];
+                    y = moves[1];
                 } else {
-                    if (isHumanTurn) {
-                        System.out.println("This cell is occupied! Choose another one!");
+                    System.out.print("Enter the coordinates: ");
+                    if (scanner.hasNextInt()) {
+                        x = Integer.parseInt(scanner.next());
+                    }
+                    if (scanner.hasNextInt()) {
+                        y = Integer.parseInt(scanner.nextLine().replace(" ", ""));
                     }
                 }
-            } else {
-                System.out.println("Coordinates should be from 1 to 3!");
+                if (!judge.isValidInput(x, y)) {
+                    System.out.println("You should enter numbers!");
+                } else if (judge.isCoordinatesInRange(x, y)) {
+                    if (judge.isValidMove(x, y)) {
+                        board.updateState(currentPlayer, x, y);
+                        if (currentPlayer.isComputer()) {
+                            System.out.println("Making move level \"easy\"");
+                        }
+                        printState(board.getState());
+                        String assessment = judge.assessBoard(p1, p2, currentPlayer);
+                        if (assessment.equals("D") || assessment.equals("W")) {
+                            break;
+                        }
+                        currentPlayer = currentPlayer == p1 ? p2 : p1;
+                    } else {
+                        if (!currentPlayer.isComputer()) {
+                            System.out.println("This cell is occupied! Choose another one!");
+                        }
+                    }
+                } else {
+                    System.out.println("Coordinates should be from 1 to 3!");
+                }
             }
-        } while (true);
+        } while (!inputs[0].equals("exit"));
     }
 }

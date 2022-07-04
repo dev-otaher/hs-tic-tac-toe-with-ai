@@ -73,8 +73,13 @@ public class Judge {
         return x >= 1 && x <= 3 && y >= 1 && y <= 3;
     }
 
+
     public boolean isValidMove(int x, int y) {
         return board.getState()[x - 1][y - 1] == '_';
+    }
+
+    public boolean isValidInput(int x, int y) {
+        return x != -1 || y != -1;
     }
 
     public int countPlayerMovements(char player) {
@@ -100,8 +105,8 @@ public class Judge {
             return "D";
         } else if (isWinner(currentPlayer)) {
             System.out.println(currentPlayer.getLetter() + " wins");
-            return "F";
+            return "W";
         }
-        return "NF";
+        return "";
     }
 }

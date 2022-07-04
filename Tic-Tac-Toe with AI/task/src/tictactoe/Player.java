@@ -3,14 +3,20 @@ package tictactoe;
 import java.util.Random;
 
 public class Player {
-    private char letter;
+    private final char letter;
+    private final boolean computer;
 
-    public Player(char letter) {
+    public Player(char letter, String type) {
         this.letter = letter;
+        computer = !type.equalsIgnoreCase("user");
     }
 
     public char getLetter() {
         return letter;
+    }
+
+    public boolean isComputer() {
+        return computer;
     }
 
     public int[] getMove() {
