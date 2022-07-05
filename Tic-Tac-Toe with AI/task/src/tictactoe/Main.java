@@ -14,6 +14,17 @@ public class Main {
         System.out.println("---------");
     }
 
+    public static Player generatePlayerByType(String type, char letter, Board board) {
+        switch (type) {
+            case "easy":
+                return new EasyComputer(letter, board);
+            case "medium":
+                return new MediumComputer(letter, board);
+            default:
+                return new Player(letter);
+        }
+    }
+
     public static void main(String[] args) {
         // write your code here
         Scanner scanner = new Scanner(System.in);
@@ -29,33 +40,22 @@ public class Main {
                 System.out.println("Bad parameters!");
                 continue;
             }
-            Player p1 = new Player('X', inputs[1]), p2 = new Player('O', inputs[2]);
             Board board = new Board("_________");
             Judge judge = new Judge(board);
-            int x = -1, y = -1;
+            Player p1 = generatePlayerByType(inputs[1], 'X', board);
+            Player p2 = generatePlayerByType(inputs[2], 'O', board);
             Player currentPlayer = p1;
             printState(board.getState());
             while (true) {
-                if (currentPlayer.isComputer()) {
-                    int[] moves = currentPlayer.getMove();
-                    x = moves[0];
-                    y = moves[1];
-                } else {
-                    System.out.print("Enter the coordinates: ");
-                    if (scanner.hasNextInt()) {
-                        x = Integer.parseInt(scanner.next());
-                    }
-                    if (scanner.hasNextInt()) {
-                        y = Integer.parseInt(scanner.nextLine().replace(" ", ""));
-                    }
-                }
+                int[] move = currentPlayer.getMove();
+                int x = move[0], y = move[1];
                 if (!judge.isValidInput(x, y)) {
                     System.out.println("You should enter numbers!");
                 } else if (judge.isCoordinatesInRange(x, y)) {
                     if (judge.isValidMove(x, y)) {
                         board.updateState(currentPlayer, x, y);
-                        if (currentPlayer.isComputer()) {
-                            System.out.println("Making move level \"easy\"");
+                        if (currentPlayer instanceof EasyComputer) {
+                            System.out.printf("Making move level \"%s\"\n", currentPlayer.getLevel());
                         }
                         printState(board.getState());
                         String assessment = judge.assessBoard(p1, p2, currentPlayer);
@@ -64,7 +64,7 @@ public class Main {
                         }
                         currentPlayer = currentPlayer == p1 ? p2 : p1;
                     } else {
-                        if (!currentPlayer.isComputer()) {
+                        if (!(currentPlayer instanceof EasyComputer)) {
                             System.out.println("This cell is occupied! Choose another one!");
                         }
                     }

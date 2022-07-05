@@ -331,6 +331,321 @@ files:
         }
     }
   learner_created: false
+- name: src/tictactoe/Board.java
+  visible: true
+  text: |
+    package tictactoe;
+
+    import java.util.Arrays;
+
+    public class Board {
+        private final char[][] state;
+        private boolean empty;
+
+        public Board(String stateString) {
+            this.state = parseState(stateString);
+            setEmpty();
+        }
+
+        private void setEmpty() {
+            this.empty = Arrays.deepToString(state).equals("_________");
+        }
+
+        public char[][] getState() {
+            return state;
+        }
+
+        public boolean isEmpty() {
+            return empty;
+        }
+
+        private char[][] parseState(String stateString) {
+            char[][] array = new char[3][3];
+            int charIndex = 0;
+            for (int i = 0; i < array.length; i++) {
+                for (int j = 0; j < array[i].length; j++) {
+                    array[i][j] = stateString.charAt(charIndex);
+                    charIndex++;
+                }
+            }
+            return array;
+        }
+
+        public void updateState(Player player, int x, int y) {
+            this.empty = false;
+            this.state[x - 1][y - 1] = player.getLetter();
+        }
+    }
+  learner_created: true
+- name: src/tictactoe/MediumComputer.java
+  visible: true
+  text: |
+    package tictactoe;
+
+    public class MediumComputer extends EasyComputer {
+        public MediumComputer(char letter, Board board) {
+            super(letter, board);
+        }
+
+        @Override
+        public int[] getMove() {
+            if (!board.isEmpty()) {
+                for (int i = 0; i < board.getState().length; i++) {
+                    int letterCount = Helper.countChar(String.valueOf(board.getState()[i]), letter);
+                    int emptyCount = Helper.countChar(String.valueOf(board.getState()[i]), '_');
+                    if (letterCount == 2 && emptyCount == 1) {
+                        int emptyIndex = String.valueOf(board.getState()[i]).indexOf('_');
+                        return new int[]{i + 1, emptyIndex + 1};
+                    }
+                }
+
+                String column = "";
+                for (int i = 0; i < board.getState().length; i++) {
+                    for (int j = 0; j < board.getState()[i].length; j++) {
+                        column += board.getState()[j][i];
+                        int letterCount = Helper.countChar(column, letter);
+                        int emptyCount = Helper.countChar(column, '_');
+                        if (letterCount == 2 && emptyCount == 1) {
+                            int emptyIndex = column.indexOf('_');
+                            return new int[]{emptyIndex + 1, i + 1};
+                        }
+                    }
+                }
+
+                column = "";
+                for (int i = 0; i < board.getState().length; i++) {
+                    for (int j = 0; j < board.getState()[i].length; j++) {
+                        if (i == j) {
+                            column += board.getState()[j][i];
+                        }
+                        int letterCount = Helper.countChar(column, letter);
+                        int emptyCount = Helper.countChar(column, '_');
+                        if (letterCount == 2 && emptyCount == 1) {
+                            int emptyIndex = column.indexOf('_');
+                            return new int[]{emptyIndex + 1, i + 1};
+                        }
+                    }
+                }
+
+                column = "";
+                for (int i = 0; i < board.getState().length; i++) {
+                    for (int j = 0; j < board.getState()[i].length; j++) {
+                        if (i + j == board.getState().length - 1) {
+                            column += board.getState()[j][i];
+                        }
+                        int letterCount = Helper.countChar(column, letter);
+                        int emptyCount = Helper.countChar(column, '_');
+                        if (letterCount == 2 && emptyCount == 1) {
+                            int emptyIndex = column.indexOf('_');
+                            return new int[]{emptyIndex + 1, i + 1};
+                        }
+                    }
+                }
+
+
+
+            }
+            return super.getMove();
+        }
+    }
+  learner_created: true
+- name: src/tictactoe/EasyComputer.java
+  visible: true
+  text: |
+    package tictactoe;
+
+    import java.util.Random;
+
+    public class EasyComputer extends Player {
+        Board board;
+
+        public EasyComputer(char letter, Board board) {
+            super(letter);
+            this.board = board;
+        }
+
+        public int[] getMove() {
+            int lower = 1, upper = 3;
+            Random random = new Random();
+            int x = random.nextInt(upper - lower + 1) + lower;
+            int y = random.nextInt(upper - lower + 1) + lower;
+            return new int[]{x, y};
+        }
+    }
+  learner_created: true
+- name: src/tictactoe/Helper.java
+  visible: true
+  text: |
+    package tictactoe;
+
+    public class Helper {
+        public static boolean isArrayIdentical(char[] array) {
+            for (char ch : array) {
+                if (ch != array[0]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static int countChar(String str, char c) {
+            int counter = 0;
+            for (int i = 0; i < str.length(); i++) {
+                if (str.charAt(i) == c) {
+                    counter++;
+                }
+            }
+            return counter;
+        }
+    }
+  learner_created: true
+- name: src/tictactoe/Player.java
+  visible: true
+  text: |
+    package tictactoe;
+
+    import java.util.Random;
+    import java.util.Scanner;
+
+    public class Player {
+        protected final char letter;
+
+        public Player(char letter) {
+            this.letter = letter;
+        }
+
+        public char getLetter() {
+            return letter;
+        }
+
+        public int[] getMove() {
+            System.out.print("Enter the coordinates: ");
+            Scanner scanner = new Scanner(System.in);
+            int x = Integer.parseInt(scanner.next());
+            int y = Integer.parseInt(scanner.next());
+            return new int[] {x, y};
+        }
+    }
+  learner_created: true
+- name: src/tictactoe/Judge.java
+  visible: true
+  text: |
+    package tictactoe;
+
+    import java.util.Arrays;
+
+    public class Judge {
+        private final Board board;
+
+        public Judge(Board board) {
+            this.board = board;
+        }
+
+        public boolean isWinnerByRow(Player player) {
+            for (char[] row : board.getState()) {
+                if (row[0] == player.getLetter() && Helper.isArrayIdentical(row)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public boolean isWinnerByColumn(Player player) {
+            for (int c = 0; c < board.getState().length; c++) {
+                char[] array = new char[board.getState().length];
+                for (int r = 0; r < board.getState()[c].length; r++) {
+                    array[r] = board.getState()[r][c];
+                }
+                if (array[0] == player.getLetter() && Helper.isArrayIdentical(array)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public boolean isWinnerByDiagonal(Player player) {
+            char[] array = new char[board.getState().length];
+            for (int r = 0; r < board.getState().length; r++) {
+                for (int c = 0; c < board.getState()[r].length; c++) {
+                    if (r == c) {
+                        array[r] = board.getState()[r][c];
+                    }
+                }
+            }
+            return array[0] == player.getLetter() && Helper.isArrayIdentical(array);
+        }
+
+        public boolean isWinnerByOtherDiagonal(Player player) {
+            char[] array = new char[board.getState().length];
+            for (int r = 0; r < board.getState().length; r++) {
+                for (int c = 0; c < board.getState()[r].length; c++) {
+                    if (r + c == board.getState().length - 1) {
+                        array[r] = board.getState()[r][c];
+                    }
+                }
+            }
+            return array[0] == player.getLetter() && Helper.isArrayIdentical(array);
+        }
+
+        public boolean isWinner(Player player) {
+            boolean isWinner = isWinnerByRow(player);
+            if (!isWinner) {
+                isWinner = isWinnerByColumn(player);
+            }
+            if (!isWinner) {
+                isWinner = isWinnerByDiagonal(player);
+            }
+            if (!isWinner) {
+                isWinner = isWinnerByOtherDiagonal(player);
+            }
+            return isWinner;
+        }
+
+        public boolean isCoordinatesInRange(int x, int y) {
+            return x >= 1 && x <= 3 && y >= 1 && y <= 3;
+        }
+
+
+        public boolean isValidMove(int x, int y) {
+            return board.getState()[x - 1][y - 1] == '_';
+        }
+
+        public boolean isValidInput(int x, int y) {
+            return x != -1 || y != -1;
+        }
+
+        public int countPlayerMovements(char player) {
+            return Helper.countChar(Arrays.deepToString(board.getState()), player);
+        }
+
+        public boolean isMovementsEqual() {
+            return countPlayerMovements('X') == countPlayerMovements('O');
+        }
+
+        public char getCurrentPlayer() {
+            if (isMovementsEqual()) {
+                return 'X';
+            } else {
+                return 'O';
+            }
+        }
+
+        public String assessBoard(Player p1, Player p2, Player currentPlayer) {
+            int emptyCells = countPlayerMovements('_');
+            if (!isWinner(p1) && !isWinner(p2) && emptyCells == 0) {
+                System.out.println("Draw");
+                return "D";
+            } else if (isWinner(currentPlayer)) {
+                System.out.println(currentPlayer.getLetter() + " wins");
+                return "W";
+            }
+            return "";
+        }
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/7437#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Tue, 05 Jul 2022 04:11:37 UTC
 record: -1

@@ -1,14 +1,22 @@
 package tictactoe;
 
+import java.util.Arrays;
+
 public class Board {
-    private char[][] state;
+    private final char[][] state;
+    private boolean empty;
 
     public Board(String stateString) {
         this.state = parseState(stateString);
+        this.empty = Arrays.deepToString(state).equals("_________");
     }
 
     public char[][] getState() {
         return state;
+    }
+
+    public boolean isEmpty() {
+        return empty;
     }
 
     private char[][] parseState(String stateString) {
@@ -24,6 +32,7 @@ public class Board {
     }
 
     public void updateState(Player player, int x, int y) {
+        this.empty = false;
         this.state[x - 1][y - 1] = player.getLetter();
     }
 }

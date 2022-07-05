@@ -1,29 +1,27 @@
 package tictactoe;
 
-import java.util.Random;
+import java.util.Scanner;
 
 public class Player {
-    private final char letter;
-    private final boolean computer;
+    protected final char letter;
 
-    public Player(char letter, String type) {
+    public Player(char letter) {
         this.letter = letter;
-        computer = !type.equalsIgnoreCase("user");
     }
 
     public char getLetter() {
         return letter;
     }
 
-    public boolean isComputer() {
-        return computer;
+    protected String getLevel() {
+        return "";
     }
 
     public int[] getMove() {
-        int lower = 1, upper = 3;
-        Random random = new Random();
-        int x = random.nextInt(upper - lower + 1) + lower;
-        int y = random.nextInt(upper - lower + 1) + lower;
+        System.out.print("Enter the coordinates: ");
+        Scanner scanner = new Scanner(System.in);
+        int x = Integer.parseInt(scanner.next());
+        int y = Integer.parseInt(scanner.next());
         return new int[]{x, y};
     }
 }
